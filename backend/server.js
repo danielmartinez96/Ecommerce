@@ -1,23 +1,32 @@
 import express from 'express'; 
-import data from './data.js'
+import mongoose from 'mongoose';
+import productRouter from './routers/productRouter.js';
+import userRouter from './routers/userRouter.js';
+
 const app = express();
-app.get('/api/products/:id', (req,res) =>{
-    console.log("hola");
-    const product = data.products.find(x=> x._id === req.params.id);
-    if(product){
-        res.send(product);
-    } else{
-        res.status(400).send({message: 'Product not Found'});
-    }
+mongoose.connect('mongodb://localhost/amazona',{
+    useNewUrlParser:true,
+    useUnifiedTopology:true,
+    useCreateIndex:true,
 });
+mongoose.Promise = global.Promise;
+//Get the default connection
+var db = mongoose.connection;
 
-app.get('/api/products', (req,res) =>{
-    res.send(data.products);
-});
+//Bind connection to error event (to get notification of connection errors)
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
+
+app.use('/api/users',userRouter);
+app.use('/api/products',productRouter);
 app.get('/',(req, res) =>{
     res.send('Server is ready');
 });
+
+app.use((err,req,res,next)=>{
+    res.status(500).send({message:err.message});
+});
+
 const port = process.env.PORT || 5000;
 app.listen(port,()=>{
     console.log(`Server at http://localhost:${port}`);

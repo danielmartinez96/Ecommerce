@@ -138,6 +138,7 @@ a.brand{
 /*Image*/
 img{
   border-radius: 0.5rem;
+  height: auto;
 }
 img.small{
   max-width: 5rem;
